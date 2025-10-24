@@ -54,9 +54,9 @@ def create_model(trainable_layers=0, lr=1e-3):
         layer.trainable = True
 
     x = GlobalAveragePooling2D()(base_model.output)
-    x = layers.Dropout(0.3)(x)
-    x = layers.Dense(256, activation="relu")(x)
-    x = layers.Dropout(0.2)(x)
+    x = Dropout(0.3)(x)
+    x = Dense(256, activation="relu")(x)
+    x = Dropout(0.2)(x)
     output = Dense(num_classes, activation='softmax')(x)
 
     model = Model(inputs=base_model.input, outputs=output)
