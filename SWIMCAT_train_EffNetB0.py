@@ -50,15 +50,15 @@ inputs = keras.Input(shape=(IMG_SIZE, IMG_SIZE, 3))
 x = tf.keras.applications.efficientnet.preprocess_input(inputs)
 x = base_model(x, training=False)
 x = layers.GlobalAveragePooling2D()(x)
-x = layers.Dropout(0.4)(x)
-x = layers.Dense(256, activation="relu")(x)
 x = layers.Dropout(0.3)(x)
+x = layers.Dense(256, activation="relu")(x)
+x = layers.Dropout(0.2)(x)
 outputs = layers.Dense(NUM_CLASSES, activation="softmax", dtype='float32')(x)
 
 model = keras.Model(inputs, outputs)
 
 # Compile
-optimizer = keras.optimizers.Adam(learning_rate=5e-4)
+optimizer = keras.optimizers.Adam(learning_rate=1e-3)
 model.compile(optimizer=optimizer, loss="categorical_crossentropy", metrics=["accuracy"])
 
 # Callbacks
@@ -67,14 +67,14 @@ early = EarlyStopping(monitor="val_accuracy", patience=5, restore_best_weights=T
 reduce_lr = ReduceLROnPlateau(monitor="val_loss", factor=0.5, patience=3)
 
 # Prvi trening
-history = model.fit(train_ds, validation_data=val_ds, epochs=10, callbacks=[checkpoint, early, reduce_lr])
+history = model.fit(train_ds, validation_data=val_ds, epochs=15, callbacks=[checkpoint, early, reduce_lr])
 
 # Fine-tuning poslednjih 10 slojeva
 base_model.trainable = True
-for layer in base_model.layers[:-10]:
+for layer in base_model.layers[:-20]:
     layer.trainable = False
 
-model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-5),
+model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-4),
               loss="categorical_crossentropy",
               metrics=["accuracy"])
 
